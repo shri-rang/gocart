@@ -74,6 +74,9 @@ export const deleteCouponOnExpiry = inngest.createFunction(
  {id: 'delete-coupon-expiry'},
  {event: 'app/coupon.expired'}, 
  async ({event, step})=>{
+
+  const { data } = event;
+
    
    if (!data?.expires_at) {
       console.error("expires_at missing:", data);
