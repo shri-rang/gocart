@@ -1,12 +1,17 @@
 'use client'
 import { dummyStoreDashboardData } from "@/assets/assets"
 import Loading from "@/components/Loading"
+import { useAuth } from "@clerk/nextjs"
+import axios from "axios"
 import { CircleDollarSignIcon, ShoppingBasketIcon, StarIcon, TagsIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 
 export default function Dashboard() {
+
+    const  {getToken} = useAuth();
 
     const currency = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || '$'
 
@@ -15,21 +20,42 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [dashboardData, setDashboardData] = useState({
         totalProducts: 0,
-        totalEarnings: 0,
+        totalEarning: 0,
         totalOrders: 0,
         ratings: [],
     })
 
     const dashboardCardsData = [
         { title: 'Total Products', value: dashboardData.totalProducts, icon: ShoppingBasketIcon },
-        { title: 'Total Earnings', value: currency + dashboardData.totalEarnings, icon: CircleDollarSignIcon },
+        { title: 'Total Earnings', value:  dashboardData.totalEarning, icon: CircleDollarSignIcon },
         { title: 'Total Orders', value: dashboardData.totalOrders, icon: TagsIcon },
         { title: 'Total Ratings', value: dashboardData.ratings.length, icon: StarIcon },
     ]
 
     const fetchDashboardData = async () => {
-        setDashboardData(dummyStoreDashboardData)
-        setLoading(false)
+         try {
+
+            const token = await  getToken()
+         
+             const {data} = await axios.get('/api/store/dashboard',
+               { headers : {
+                Authorization : `Bearer ${token}`
+               } } )
+
+               setDashboardData(data.dashboardData);
+
+               console.log("dashboard data ",  data.dashboardData.totalEarning,);
+
+            
+         } catch (error) {
+            // console.error(error)
+            toast.error( error?.response?.data?.error || error.message )
+         }
+
+         setLoading(false)
+
+        // setDashboardData(dummyStoreDashboardData)
+        // setLoading(false)
     }
 
     useEffect(() => {

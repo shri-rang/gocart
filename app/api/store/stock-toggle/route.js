@@ -11,10 +11,10 @@ export async function POST(request){
 
   try {
      const  {userId} = getAuth(request)
-     const {prodcutId } = await request.json()
+     const {productId } = await request.json()
 
 
-     if(!prodcutId){
+     if(!productId){
          return NextResponse.json({error : "missing details : productId"} , { status: 400 })
      }
 
@@ -28,7 +28,7 @@ export async function POST(request){
     // check if product exits 
 
 
-    const product = await prisma.product.findFirst({ where : { id: prodcutId, storeId } })
+    const product = await prisma.product.findFirst({ where : { id: productId, storeId } })
 
 
   if(!product){
@@ -37,8 +37,8 @@ export async function POST(request){
 
     
    await prisma.product.update({
-    where : { id : prodcutId},
-    data: {inStock: product.inStock}
+    where : { id : productId},
+    data: {inStock: !product.inStock}
    })
 
 

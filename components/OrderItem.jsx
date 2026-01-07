@@ -11,7 +11,11 @@ const OrderItem = ({ order }) => {
     const currency = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || '$';
     const [ratingModal, setRatingModal] = useState(null);
 
+       console.log("in the ui", useSelector(state => state.rating))
+
     const { ratings } = useSelector(state => state.rating);
+
+ 
 
     return (
         <>

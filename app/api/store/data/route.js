@@ -13,8 +13,8 @@ export async function GET(request){
 
         // Get store username from query parameter
        
-         const { searchparams } = new URL( request.url)
-         const username = searchparams.get('username').toLowerCase();
+         const { searchParams } = new URL(request.url)
+         const username = searchParams.get('username').toLowerCase();
 
             if(!username){
              return NextResponse.json({ error : "missing username" },  { status:400})
@@ -25,7 +25,7 @@ export async function GET(request){
          
          const store = await prisma.store.findUnique(
             { where: {username, isActive: true }, 
-             include :{ product: { include: { rating : true} } } 
+             include :{ Product: { include: { rating : true} } } 
         })
 
         if(!store){

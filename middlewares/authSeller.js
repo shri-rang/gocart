@@ -1,18 +1,19 @@
-const { err } = require("inngest/types");
-
-const  prisma  = "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 
 const authSeller = async(userId)=> {
  
      try {
-         const user = await prisma.user.findUnique(
-            { where: { id: userId },
-            include: {store: true }
+         console.log("user id",userId)
+         const user = await prisma.user.findUnique({
+             where: { id: userId },
+             include: {store: true }
         } )
-
+         
+         console.log("store status ", user.store );
         if (user.store) {
              if (user.store.status === 'approved' ) {
+                console.log("store id ", user.store.id );
                  return user.store.id;
              }
         }else{
@@ -20,7 +21,7 @@ const authSeller = async(userId)=> {
         }
 
      } catch (error) { 
-        console.error(error)
+        console.error("errr i nconsole loggg",error)
         return false
         
      }

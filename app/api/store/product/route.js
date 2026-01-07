@@ -4,6 +4,7 @@ import authSeller from "@/middlewares/authSeller"
 import { NextResponse } from "next/server";
 import imagekit from "@/configs/imagekit";
 import prisma from "@/lib/prisma";
+import { toFile } from "@imagekit/nodejs";
 // Add a new product
 
 export async function POST(request){
@@ -26,7 +27,7 @@ export async function POST(request){
        const mrp =  Number(formData.get("mrp")) 
        const price = Number(formData.get("price"))  
        const category = formData.get("category")
-       const images = formData.get("images")       
+       const images = formData.getAll("images")       
 
         if(!name || !description || !mrp || !price || !category ||  images.length < 1 ){
               return NextResponse.json({error: 'missing product details'}, {status:400} )
@@ -34,26 +35,37 @@ export async function POST(request){
 
         // uploding images to imageKit
 
-      const imagesUrl = await Promise.all( images.map( async (image)=> {
-                const buffer = Buffer.from( await image.arrayBuffer())
-                const response = await imagekit.upload(
-                    {
-                        file: buffer,
-                        fileName : image.name,
-                        folder: "products"
-                    }
-                )
-                const url = imagekit.url({
-                    path: response.filePath,
-                    transformation : [
-                    {   quality: 'auto'    },
-                    {  format:'webp'   },
-                    {  width:'1024'   } 
-                    ]
-                    
-                })
-                return url;
-       }))
+     const imagesUrl = await Promise.all(
+  images.map(async (image) => {
+    // Convert File → Buffer
+    const buffer = Buffer.from(await image.arrayBuffer());
+
+    // Upload to ImageKit (correct API)
+    const response = await imagekit.files.upload({
+      file: await toFile(buffer),
+      fileName: image.name,
+      folder: "products"
+    });
+
+    // Generate optimized URL
+    const optimizedImage = imagekit.helper.buildSrc({
+     urlEndpoint: 'https://ik.imagekit.io/rospcesed',
+     src: response.filePath,
+      transformation: [
+        { quality: "auto" },
+        { format: "webp" },
+        { width: 1024 }
+      ]
+    });
+
+    console.log("imageUrl:", optimizedImage);
+    return optimizedImage;
+  })
+);
+
+console.log("imagesUrl:", imagesUrl);
+
+      // console.log("storeId:", url);
      
         await prisma.product.create({ 
             data: {
