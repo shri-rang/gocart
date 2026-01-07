@@ -12,7 +12,7 @@ export async function POST(request){
  try {
   const body  = await request.text();
 
-  const sig = request.get('stripe-signature')
+  const sig = request.headers.get('stripe-signature')
  
   const event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
 
@@ -61,12 +61,12 @@ export async function POST(request){
   switch (event.type) {
 
     case 'payment_intent.succeeded':{
-         await handlePayment(event.data.object.id, true)
+         await handlePaymenIntent(event.data.object.id, true)
          break;
 
     }
      case 'payment_intent.canceled':{
-         await handlePayment(event.data.object.id, false)
+         await handlePaymenIntent(event.data.object.id, false)
          break;
          
     }
