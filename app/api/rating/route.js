@@ -3,6 +3,7 @@
 
 // Add new rating
 
+import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
