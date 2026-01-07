@@ -3,7 +3,6 @@ import { assets } from "@/assets/assets"
 import { useAuth } from "@clerk/nextjs"
 import axios from "axios"
 import Image from "next/image"
-import { get } from "node:http"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
 
