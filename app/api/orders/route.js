@@ -179,9 +179,7 @@ export async function POST(request) {
             
           }
 
-          if (condition) {
-            
-          }
+        
 
           // clear the cart
 
